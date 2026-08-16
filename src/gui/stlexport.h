@@ -74,6 +74,7 @@ class stlExport_c : public LFl_Double_Window {
     LFl_Radio_Button *ExpShape, *ExpSolution;
     LFl_Int_Input *SolutionNum;
     LFl_Check_Button *Binary;
+    LFl_Check_Button *CoplanarMerge;
     ButtonGroup_c * mode;
 
     pixmapList_c pm;

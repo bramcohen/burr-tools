@@ -23,8 +23,10 @@
 
 #include "../halfedge/polyhedron.h"
 #include "../halfedge/vector3.h"
+#include "../halfedge/modifiers.h"
 
 #include <string.h>
+#include <cmath>
 
 /** \page STL Surface Tessellation Language
  *
@@ -67,7 +69,9 @@ static void writeTriangles(FILE * f, bool binaryMode, const Polyhedron * poly, u
     if (fc->hole())
       continue;
 
-    const Vector3Df normalVector = fc->normal();
+    Vector3Df normalVector = fc->normal();
+    if (std::isnan(normalVector.x()) || std::isnan(normalVector.y()) || std::isnan(normalVector.z()))
+      normalVector = Vector3Df(0, 0, 0);
     const float * normal = normalVector.getData();
 
     Face::const_edge_circulator e = fc->begin();
@@ -167,6 +171,13 @@ void stlExporter_c::write(const char * fname, const std::vector<const voxel_c *>
     {
       fclose(f);
       throw e;
+    }
+
+    if (coplanarMerge)
+    {
+      Polyhedron * merged = mergeCoplanarFaces(*poly);
+      delete poly;
+      poly = merged;
     }
 
     // write out the generated polyhedron
